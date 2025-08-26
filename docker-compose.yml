@@ -1,0 +1,7 @@
+version: '3.8'
+services:
+  meet-bots:
+    build: .
+    environment:
+      - MEET_URL=https://meet.google.com/oru-azsu-cmo
+    restart: unless-stopped

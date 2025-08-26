@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Meet Bot Controller</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script>
+    <style>
+        body { font-family: Arial; margin: 20px; background: #1a1a1a; color: white; }
+        .controls { background: #2d2d2d; padding: 20px; border-radius: 8px; margin-bottom: 20px; }
+        .console { background: #000; color: #00ff00; padding: 20px; border-radius: 8px; height: 400px; overflow-y: auto; font-family: monospace; }
+        input, button { padding: 10px; margin: 5px; border: none; border-radius: 4px; }
+        input { background: #3d3d3d; color: white; width: 300px; }
+        button { background: #007bff; color: white; cursor: pointer; }
+        .vpn-info { background: #17a2b8; padding: 10px; border-radius: 4px; margin-bottom: 20px; }
+    </style>
+</head>
+<body>
+    <h1>🤖 Meet Bot Controller</h1>
+    
+    <div class="vpn-info">
+        <strong>💡 VPN Solution:</strong> Connect different VPN → Fresh IP → Launch bots successfully!
+    </div>
+    
+    <div class="controls">
+        <input type="text" id="meetUrl" placeholder="Meet URL" value="https://meet.google.com/oru-azsu-cmo">
+        <input type="number" id="botCount" placeholder="Bot count" value="10" min="1" max="50">
+        <button onclick="runBots()">🚀 Launch Bots</button>
+        <button onclick="checkIP()">🌐 Check IP</button>
+        <button onclick="clearConsole()">Clear</button>
+    </div>
+    
+    <div class="console" id="console">
+        <div>🤖 Bot Controller Ready - Connect VPN for fresh IP!</div>
+    </div>
+
+    <script>
+        const socket = io();
+        const console_div = document.getElementById('console');
+        
+        socket.on('console_output', function(data) {
+            const div = document.createElement('div');
+            div.textContent = data.data;
+            console_div.appendChild(div);
+            console_div.scrollTop = console_div.scrollHeight;
+        });
+        
+        function runBots() {
+            const meetUrl = document.getElementById('meetUrl').value;
+            const botCount = document.getElementById('botCount').value;
+            
+            addToConsole('🚀 Launching ' + botCount + ' bots...');
+            socket.emit('run_bots', {meet_url: meetUrl, bot_count: botCount});
+        }
+        
+        function checkIP() {
+            fetch('https://api.ipify.org?format=json')
+                .then(response => response.json())
+                .then(data => addToConsole('🌐 Current IP: ' + data.ip))
+                .catch(err => addToConsole('❌ IP check failed'));
+        }
+        
+        function clearConsole() {
+            console_div.innerHTML = '<div>🗑️ Console cleared</div>';
+        }
+        
+        function addToConsole(message) {
+            const div = document.createElement('div');
+            div.textContent = message;
+            console_div.appendChild(div);
+            console_div.scrollTop = console_div.scrollHeight;
+        }
+    </script>
+</body>
+</html>
